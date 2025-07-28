@@ -1,15 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>BCWL Game Desk v2 – Territory & Possession Tracker</title>
+  <title>BCWL Game Desk – Territory & Possession Tracker</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    .grid { display: grid; grid-template-columns: repeat(3, 160px); grid-template-rows: repeat(2, 160px); gap: 5px; margin-top: 20px; }
-    .zone { background: #cce4f7; border: 2px solid #000; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; cursor: pointer; }
-    .controls, .teams, .direction { margin-top: 15px; }
-    button { padding: 8px 16px; margin: 5px; font-size: 16px; cursor: pointer; }
+    .grid { display: grid; grid-template-columns: repeat(3, 280px); grid-template-rows: repeat(2, 280px); gap: 5px; margin-top: 20px; }
+    .zone { background: #cce4f7; border: 2px solid #000; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 22px; cursor: pointer; }
+    .controls, .teams, .direction, .setup { margin-top: 15px; }
+    button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
     #timer, .stats { font-size: 18px; font-weight: bold; margin-top: 10px; }
     .active { background-color: #a6f5a6 !important; }
   </style>
@@ -21,6 +20,24 @@
 
 <div class="setup">
   <label>Game Name: <input type="text" id="gameName" placeholder="e.g. Dragons vs Centaurs"></label><br>
+
+  <label>White Team:
+    <select id="whiteTeam">
+      <option>Tigers</option><option>Lions</option><option>Leopards</option><option>Jaguars</option><option>Caracals</option>
+      <option>Barbells</option><option>Gryphons</option><option>Dragons</option><option>Centaurs</option><option>Bullcats</option>
+      <option>Kestrels</option><option>Eagles</option><option>Condors</option><option>Falcons</option><option>Ospreys</option>
+      <option>Hawks</option><option>Harriers</option><option>Kites</option><option>Vultures</option>
+    </select>
+  </label><br>
+
+  <label>Dark Team:
+    <select id="darkTeam">
+      <option>Tigers</option><option>Lions</option><option>Leopards</option><option>Jaguars</option><option>Caracals</option>
+      <option>Barbells</option><option>Gryphons</option><option>Dragons</option><option>Centaurs</option><option>Bullcats</option>
+      <option>Kestrels</option><option>Eagles</option><option>Condors</option><option>Falcons</option><option>Ospreys</option>
+      <option>Hawks</option><option>Harriers</option><option>Kites</option><option>Vultures</option>
+    </select>
+  </label><br>
 
   <label>Quarter:
     <select id="quarter">
@@ -107,14 +124,17 @@
 
   function setDirection(dir) {
     direction = dir;
+    const text = dir === 'left-to-right' ? 'Left → Right' : 'Right ← Left';
     document.getElementById("dirL2R").classList.toggle("active", dir === 'left-to-right');
     document.getElementById("dirR2L").classList.toggle("active", dir === 'right-to-left');
-    document.getElementById("currentDirection").innerText = dir === 'left-to-right' ? "Left → Right" : "Right ← Left";
+    document.getElementById("currentDirection").innerText = text;
   }
 
   function setZone(zone) {
     currentZone = zone;
-    for (let i = 1; i <= 6; i++) document.getElementById(`zone${i}`).classList.remove("active");
+    for (let i = 1; i <= 6; i++) {
+      document.getElementById(`zone${i}`).classList.remove("active");
+    }
     document.getElementById(`zone${zone}`).classList.add("active");
   }
 
