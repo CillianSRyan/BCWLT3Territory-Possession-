@@ -9,6 +9,7 @@
     .zone { background: #cce4f7; border: 2px solid #000; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 22px; cursor: pointer; }
     .controls, .teams, .direction, .setup { margin-top: 15px; }
     button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+    .poss-btn { font-size: 28px; padding: 20px 30px; margin: 10px; }
     #timer, .stats { font-size: 18px; font-weight: bold; margin-top: 10px; }
     .active { background-color: #a6f5a6 !important; }
   </style>
@@ -46,24 +47,24 @@
   </label>
 </div>
 
-<div class="controls">
-  <button onclick="startGame()">Start Game</button>
-  <button onclick="pauseGame()">Pause Game</button>
-  <button onclick="stopGame()">End Game</button>
-  <div id="timer">00:00</div>
-</div>
-
-<div class="teams">
-  <button id="whiteBtn" onclick="setPossession('White')">WHITE</button>
-  <button id="darkBtn" onclick="setPossession('Dark')">DARK</button>
-  <div>Current Possession: <span id="currentPossession">None</span></div>
-</div>
-
 <div class="direction">
   <p><strong>White Team Direction:</strong></p>
   <button id="dirL2R" onclick="setDirection('left-to-right')">White: Left to Right</button>
   <button id="dirR2L" onclick="setDirection('right-to-left')">White: Right to Left</button>
   <div>Current Direction: <span id="currentDirection">None</span></div>
+</div>
+
+<div class="teams">
+  <button class="poss-btn" id="whiteBtn" onclick="setPossession('White')">WHITE</button>
+  <button class="poss-btn" id="darkBtn" onclick="setPossession('Dark')">DARK</button>
+  <div>Current Possession: <span id="currentPossession">None</span></div>
+</div>
+
+<div class="controls">
+  <button onclick="startGame()">Start Game</button>
+  <button onclick="pauseGame()">Pause Game</button>
+  <button onclick="stopGame()">End Game</button>
+  <div id="timer">00:00</div>
 </div>
 
 <h3>Click Pool Zone:</h3>
