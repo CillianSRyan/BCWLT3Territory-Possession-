@@ -5,10 +5,10 @@
   <title>BCWL Game Desk – Territory Tracker</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    .grid { display: grid; grid-template-columns: repeat(3, 120px); grid-template-rows: repeat(2, 120px); gap: 5px; margin-top: 20px; }
-    .zone { background: #cce4f7; border: 2px solid #000; display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; }
-    .controls, .teams { margin-top: 10px; }
-    button { padding: 8px 16px; margin: 5px; font-size: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 180px); grid-template-rows: repeat(2, 180px); gap: 5px; margin-top: 20px; }
+    .zone { background: #cce4f7; border: 2px solid #000; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; cursor: pointer; }
+    .controls, .teams, .direction { margin-top: 15px; }
+    button { padding: 8px 16px; margin: 5px; font-size: 16px; cursor: pointer; }
     #timer { font-size: 18px; font-weight: bold; margin-top: 10px; }
   </style>
 </head>
@@ -89,6 +89,13 @@
   <div>Current Possession: <span id="currentPossession">None</span></div>
 </div>
 
+<div class="direction">
+  <p><strong>White Team Direction:</strong></p>
+  <button onclick="setDirection('left-to-right')">White: Left to Right</button>
+  <button onclick="setDirection('right-to-left')">White: Right to Left</button>
+  <div>Current Direction: <span id="currentDirection">None</span></div>
+</div>
+
 <h3>Click Pool Zone:</h3>
 <div class="grid">
   <div class="zone" onclick="logTerritory(1)">Zone 1</div>
@@ -101,12 +108,25 @@
 
 <script>
   let possession = null;
+  let direction = null;
   let timer = null;
   let seconds = 0;
 
   function setPossession(team) {
     possession = team;
     document.getElementById("currentPossession").innerText = team;
+  }
+
+  function setDirection(dir) {
+    direction = dir;
+    const text = dir === 'left-to-right' ? 'Left → Right' : 'Right → Left';
+    document.getElementById("currentDirection").innerText = text;
+  }
+
+  function getTerritoryStatus(zone) {
+    if (!direction) return "Unknown";
+    const attackZones = direction === 'left-to-right' ? [4, 5, 6] : [1, 2, 3];
+    return attackZones.includes(zone) ? "Attack" : "Defense";
   }
 
   function formatTime(secs) {
@@ -137,10 +157,15 @@
       alert("Select possession first (WHITE or DARK)");
       return;
     }
+    if (!direction) {
+      alert("Set team direction (Left to Right or Right to Left)");
+      return;
+    }
 
     const data = {
       time: formatTime(seconds),
       possession: possession,
+      territory: getTerritoryStatus(zone),
       zone: `Zone ${zone}`,
       quarter: document.getElementById("quarter").value,
       game: document.getElementById("gameName").value,
