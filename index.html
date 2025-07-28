@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>BCWL Game Desk – Territory & Possession Tracker</title>
+  <title>BCWL Game Desk – 3-Zone Tracker</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    .grid { display: grid; grid-template-columns: repeat(3, 280px); grid-template-rows: repeat(2, 280px); gap: 5px; margin-top: 20px; }
-    .zone { background: #cce4f7; border: 2px solid #000; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 22px; cursor: pointer; }
+    .grid { display: grid; grid-template-columns: repeat(3, 320px); gap: 10px; margin-top: 20px; }
+    .zone { background: #cce4f7; border: 2px solid #000; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 26px; height: 160px; cursor: pointer; }
     .controls, .teams, .direction, .setup { margin-top: 15px; }
     button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
     .poss-btn { font-size: 28px; padding: 20px 30px; margin: 10px; }
@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<h2>BCWL Game Desk – Possession & Territory Tracker</h2>
+<h2>BCWL Game Desk – Possession & Territory Tracker (3-Zone)</h2>
 <div class="stats" id="liveStats">White Team: Poss 0% | Terr 0% — Dark Team: Poss 0% | Terr 0% — Neutral: 0%</div>
 
 <div class="setup">
@@ -67,14 +67,11 @@
   <div id="timer">00:00</div>
 </div>
 
-<h3>Click Pool Zone:</h3>
+<h3>Click Pool Field:</h3>
 <div class="grid">
-  <div class="zone" id="zone1" onclick="setZone(1)">Zone 1</div>
-  <div class="zone" id="zone2" onclick="setZone(2)">Zone 2</div>
-  <div class="zone" id="zone3" onclick="setZone(3)">Zone 3</div>
-  <div class="zone" id="zone4" onclick="setZone(4)">Zone 4</div>
-  <div class="zone" id="zone5" onclick="setZone(5)">Zone 5</div>
-  <div class="zone" id="zone6" onclick="setZone(6)">Zone 6</div>
+  <div class="zone" id="leftField" onclick="setZone('Left')">Left Field</div>
+  <div class="zone" id="centerField" onclick="setZone('Centre')">Centre</div>
+  <div class="zone" id="rightField" onclick="setZone('Right')">Right Field</div>
 </div>
 
 <script>
@@ -133,25 +130,27 @@
 
   function setZone(zone) {
     currentZone = zone;
-    for (let i = 1; i <= 6; i++) {
-      document.getElementById(`zone${i}`).classList.remove("active");
-    }
-    document.getElementById(`zone${zone}`).classList.add("active");
+    ["leftField", "centerField", "rightField"].forEach(id => {
+      document.getElementById(id).classList.remove("active");
+    });
+    if (zone === "Left") document.getElementById("leftField").classList.add("active");
+    if (zone === "Centre") document.getElementById("centerField").classList.add("active");
+    if (zone === "Right") document.getElementById("rightField").classList.add("active");
   }
 
   function updateStats() {
     if (!possession || !direction || !currentZone) return;
 
-    const attackingZones = direction === 'left-to-right'
-      ? { White: [4, 5, 6], Dark: [1, 2, 3] }
-      : { White: [1, 2, 3], Dark: [4, 5, 6] };
-
     stats[possession].possession += 1;
 
-    if ([2, 5].includes(currentZone)) {
+    if (currentZone === "Centre") {
       stats.Neutral += 1;
     } else {
-      if (attackingZones[possession].includes(currentZone)) {
+      const attackingSide = direction === 'left-to-right'
+        ? { White: 'Right', Dark: 'Left' }
+        : { White: 'Left', Dark: 'Right' };
+
+      if (attackingSide[possession] === currentZone) {
         stats[possession].attack += 1;
       }
     }
@@ -171,5 +170,7 @@
   }
 </script>
 
+</body>
+</html>
 </body>
 </html>
