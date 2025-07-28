@@ -18,61 +18,28 @@
 
 <div class="setup">
   <label>Game Name: <input type="text" id="gameName" placeholder="e.g. Dragons vs Centaurs"></label><br>
-  
-  <label>White Team: 
+
+  <label>White Team:
     <select id="whiteTeam">
-      <option>Tigers</option>
-      <option>Lions</option>
-      <option>Leopards</option>
-      <option>Jaguars</option>
-      <option>Caracals</option>
-      <option>Barbells</option>
-      <option>Gryphons</option>
-      <option>Dragons</option>
-      <option>Centaurs</option>
-      <option>Bullcats</option>
-      <option>Kestrels</option>
-      <option>Eagles</option>
-      <option>Condors</option>
-      <option>Falcons</option>
-      <option>Ospreys</option>
-      <option>Hawks</option>
-      <option>Harriers</option>
-      <option>Kites</option>
-      <option>Vultures</option>
+      <option>Tigers</option><option>Lions</option><option>Leopards</option><option>Jaguars</option><option>Caracals</option>
+      <option>Barbells</option><option>Gryphons</option><option>Dragons</option><option>Centaurs</option><option>Bullcats</option>
+      <option>Kestrels</option><option>Eagles</option><option>Condors</option><option>Falcons</option><option>Ospreys</option>
+      <option>Hawks</option><option>Harriers</option><option>Kites</option><option>Vultures</option>
     </select>
   </label><br>
 
-  <label>Dark Team: 
+  <label>Dark Team:
     <select id="darkTeam">
-      <option>Tigers</option>
-      <option>Lions</option>
-      <option>Leopards</option>
-      <option>Jaguars</option>
-      <option>Caracals</option>
-      <option>Barbells</option>
-      <option>Gryphons</option>
-      <option>Dragons</option>
-      <option>Centaurs</option>
-      <option>Bullcats</option>
-      <option>Kestrels</option>
-      <option>Eagles</option>
-      <option>Condors</option>
-      <option>Falcons</option>
-      <option>Ospreys</option>
-      <option>Hawks</option>
-      <option>Harriers</option>
-      <option>Kites</option>
-      <option>Vultures</option>
+      <option>Tigers</option><option>Lions</option><option>Leopards</option><option>Jaguars</option><option>Caracals</option>
+      <option>Barbells</option><option>Gryphons</option><option>Dragons</option><option>Centaurs</option><option>Bullcats</option>
+      <option>Kestrels</option><option>Eagles</option><option>Condors</option><option>Falcons</option><option>Ospreys</option>
+      <option>Hawks</option><option>Harriers</option><option>Kites</option><option>Vultures</option>
     </select>
   </label><br>
 
-  <label>Quarter: 
+  <label>Quarter:
     <select id="quarter">
-      <option>Q1</option>
-      <option>Q2</option>
-      <option>Q3</option>
-      <option>Q4</option>
+      <option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option>
     </select>
   </label>
 </div>
@@ -98,19 +65,25 @@
 
 <h3>Click Pool Zone:</h3>
 <div class="grid">
-  <div class="zone" onclick="logTerritory(1)">Zone 1</div>
-  <div class="zone" onclick="logTerritory(2)">Zone 2</div>
-  <div class="zone" onclick="logTerritory(3)">Zone 3</div>
-  <div class="zone" onclick="logTerritory(4)">Zone 4</div>
-  <div class="zone" onclick="logTerritory(5)">Zone 5</div>
-  <div class="zone" onclick="logTerritory(6)">Zone 6</div>
+  <div class="zone" onclick="setZone(1)">Zone 1</div>
+  <div class="zone" onclick="setZone(2)">Zone 2</div>
+  <div class="zone" onclick="setZone(3)">Zone 3</div>
+  <div class="zone" onclick="setZone(4)">Zone 4</div>
+  <div class="zone" onclick="setZone(5)">Zone 5</div>
+  <div class="zone" onclick="setZone(6)">Zone 6</div>
 </div>
 
 <script>
   let possession = null;
   let direction = null;
+  let currentZone = null;
   let timer = null;
   let seconds = 0;
+
+  const dataTracker = {
+    White: {},
+    Dark: {}
+  };
 
   function setPossession(team) {
     possession = team;
@@ -123,10 +96,56 @@
     document.getElementById("currentDirection").innerText = text;
   }
 
-  function getTerritoryStatus(zone) {
-    if (!direction) return "Unknown";
-    const attackZones = direction === 'left-to-right' ? [4, 5, 6] : [1, 2, 3];
-    return attackZones.includes(zone) ? "Attack" : "Defense";
+  function setZone(zone) {
+    currentZone = zone;
+  }
+
+  function getCurrentQuarter() {
+    return document.getElementById("quarter").value;
+  }
+
+  function isAttackZone(zone, team) {
+    if (!direction || !team) return false;
+    const attackingZones = direction === 'left-to-right'
+      ? (team === 'White' ? [4, 5, 6] : [1, 2, 3])
+      : (team === 'White' ? [1, 2, 3] : [4, 5, 6]);
+    return attackingZones.includes(zone);
+  }
+
+  function updateStats() {
+    if (!possession || !currentZone || !direction) return;
+    const quarter = getCurrentQuarter();
+    const team = possession;
+    const defendingTeam = team === 'White' ? 'Dark' : 'White';
+
+    if (!dataTracker[team][quarter]) {
+      dataTracker[team][quarter] = { possession: 0, attack: 0, defense: 0 };
+      dataTracker[defendingTeam][quarter] = { possession: 0, attack: 0, defense: 0 };
+    }
+
+    dataTracker[team][quarter].possession += 1;
+    if (isAttackZone(currentZone, team)) {
+      dataTracker[team][quarter].attack += 1;
+    } else {
+      dataTracker[team][quarter].defense += 1;
+    }
+  }
+
+  function startGame() {
+    if (!timer) {
+      seconds = 0;
+      timer = setInterval(() => {
+        seconds++;
+        document.getElementById("timer").innerText = formatTime(seconds);
+        updateStats();
+      }, 1000);
+    }
+  }
+
+  function stopGame() {
+    clearInterval(timer);
+    timer = null;
+    sendToMakeWebhook();
   }
 
   function formatTime(secs) {
@@ -135,52 +154,45 @@
     return `${m}:${s}`;
   }
 
-  function updateTimer() {
-    seconds++;
-    document.getElementById("timer").innerText = formatTime(seconds);
+  function sendToMakeWebhook() {
+    const rows = [];
+
+    ['White', 'Dark'].forEach(team => {
+      for (const quarter in dataTracker[team]) {
+        const stats = dataTracker[team][quarter];
+        const totalTime = stats.possession;
+        const attackPercent = totalTime > 0 ? Math.round((stats.attack / totalTime) * 100) + "%" : "0%";
+        const defensePercent = totalTime > 0 ? Math.round((stats.defense / totalTime) * 100) + "%" : "0%";
+        const possessionPercent = getTotalPossessionPercent(team, quarter);
+
+        rows.push({
+          team: team,
+          quarter: quarter,
+          possessionTime: stats.possession,
+          possessionPercent: possessionPercent,
+          attackTime: stats.attack,
+          attackPercent: attackPercent,
+          defenseTime: stats.defense,
+          defensePercent: defensePercent,
+          game: document.getElementById("gameName").value
+        });
+      }
+    });
+
+    fetch("https://hook.eu2.make.com/k8tsqkaq51evdo84ayijclh9psx9kgf8", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rows)
+    });
+
+    console.log("📤 Data sent to Make.com:", rows);
   }
 
-  function startGame() {
-    if (!timer) {
-      seconds = 0;
-      timer = setInterval(updateTimer, 1000);
-    }
-  }
-
-  function stopGame() {
-    clearInterval(timer);
-    timer = null;
-  }
-
-  function logTerritory(zone) {
-    if (!possession) {
-      alert("Select possession first (WHITE or DARK)");
-      return;
-    }
-    if (!direction) {
-      alert("Set team direction (Left to Right or Right to Left)");
-      return;
-    }
-
-    const data = {
-      time: formatTime(seconds),
-      possession: possession,
-      territory: getTerritoryStatus(zone),
-      zone: `Zone ${zone}`,
-      quarter: document.getElementById("quarter").value,
-      game: document.getElementById("gameName").value,
-      whiteTeam: document.getElementById("whiteTeam").value,
-      darkTeam: document.getElementById("darkTeam").value
-    };
-
-    console.log("📊 LOGGED ENTRY:", data);
-
-    // Optional: send to webhook/Sheets here
-    // fetch('https://your-make-webhook-url', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(data)
-    // });
+  function getTotalPossessionPercent(team, quarter) {
+    const teamTime = dataTracker[team]?.[quarter]?.possession || 0;
+    const otherTeam = team === 'White' ? 'Dark' : 'White';
+    const total = teamTime + (dataTracker[otherTeam]?.[quarter]?.possession || 0);
+    return total > 0 ? Math.round((teamTime / total) * 100) + "%" : "0%";
   }
 </script>
 
