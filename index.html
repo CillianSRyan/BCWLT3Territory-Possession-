@@ -109,9 +109,36 @@
   }
 
   function stopGame() {
-    clearInterval(timer);
-    timer = null;
-  }
+  clearInterval(timer);
+  timer = null;
+
+  // Prepare data to send
+  const payload = {
+    timestamp: new Date().toISOString(),
+    gameName: document.getElementById("gameName").value,
+    quarter: document.getElementById("quarter").value,
+    whiteTeam: document.getElementById("whiteTeam").value,
+    darkTeam: document.getElementById("darkTeam").value,
+    totalTime: seconds,
+    whitePoss: Math.round((stats.White.possession / (stats.White.possession + stats.Dark.possession)) * 100) || 0,
+    darkPoss: Math.round((stats.Dark.possession / (stats.White.possession + stats.Dark.possession)) * 100) || 0,
+    whiteTerr: Math.round((stats.White.attack / (stats.White.attack + stats.Dark.attack + stats.Neutral)) * 100) || 0,
+    darkTerr: Math.round((stats.Dark.attack / (stats.White.attack + stats.Dark.attack + stats.Neutral)) * 100) || 0,
+    neutralTerr: 100 - (
+      Math.round((stats.White.attack / (stats.White.attack + stats.Dark.attack + stats.Neutral)) * 100) || 0
+      + Math.round((stats.Dark.attack / (stats.White.attack + stats.Dark.attack + stats.Neutral)) * 100) || 0
+    )
+  };
+
+  // Send to Make Webhook
+  fetch("YOUR_WEBHOOK_URL_HERE", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => console.log("✅ Sent to Make.com", res))
+  .catch(err => console.error("❌ Error sending to Make.com", err));
+}
 
   function setPossession(team) {
     possession = team;
