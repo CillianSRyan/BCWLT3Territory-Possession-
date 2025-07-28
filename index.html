@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BCWL Game Desk – Territory Tracker</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 120px); grid-template-rows: repeat(2, 120px); gap: 5px; margin-top: 20px; }
+    .zone { background: #cce4f7; border: 2px solid #000; display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; }
+    .controls, .teams { margin-top: 10px; }
+    button { padding: 8px 16px; margin: 5px; font-size: 16px; }
+    #timer { font-size: 18px; font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>BCWL Game Desk – Possession & Territory Tracker</h2>
+
+<div class="setup">
+  <label>Game Name: <input type="text" id="gameName" placeholder="e.g. Dragons vs Centaurs"></label><br>
+  
+  <label>White Team: 
+    <select id="whiteTeam">
+      <option>Tigers</option>
+      <option>Lions</option>
+      <option>Leopards</option>
+      <option>Jaguars</option>
+      <option>Caracals</option>
+      <option>Barbells</option>
+      <option>Gryphons</option>
+      <option>Dragons</option>
+      <option>Centaurs</option>
+      <option>Bullcats</option>
+      <option>Kestrels</option>
+      <option>Eagles</option>
+      <option>Condors</option>
+      <option>Falcons</option>
+      <option>Ospreys</option>
+      <option>Hawks</option>
+      <option>Harriers</option>
+      <option>Kites</option>
+      <option>Vultures</option>
+    </select>
+  </label><br>
+
+  <label>Dark Team: 
+    <select id="darkTeam">
+      <option>Tigers</option>
+      <option>Lions</option>
+      <option>Leopards</option>
+      <option>Jaguars</option>
+      <option>Caracals</option>
+      <option>Barbells</option>
+      <option>Gryphons</option>
+      <option>Dragons</option>
+      <option>Centaurs</option>
+      <option>Bullcats</option>
+      <option>Kestrels</option>
+      <option>Eagles</option>
+      <option>Condors</option>
+      <option>Falcons</option>
+      <option>Ospreys</option>
+      <option>Hawks</option>
+      <option>Harriers</option>
+      <option>Kites</option>
+      <option>Vultures</option>
+    </select>
+  </label><br>
+
+  <label>Quarter: 
+    <select id="quarter">
+      <option>Q1</option>
+      <option>Q2</option>
+      <option>Q3</option>
+      <option>Q4</option>
+    </select>
+  </label>
+</div>
+
+<div class="controls">
+  <button onclick="startGame()">Start Game</button>
+  <button onclick="stopGame()">End Game</button>
+  <div id="timer">00:00</div>
+</div>
+
+<div class="teams">
+  <button onclick="setPossession('White')">WHITE</button>
+  <button onclick="setPossession('Dark')">DARK</button>
+  <div>Current Possession: <span id="currentPossession">None</span></div>
+</div>
+
+<h3>Click Pool Zone:</h3>
+<div class="grid">
+  <div class="zone" onclick="logTerritory(1)">Zone 1</div>
+  <div class="zone" onclick="logTerritory(2)">Zone 2</div>
+  <div class="zone" onclick="logTerritory(3)">Zone 3</div>
+  <div class="zone" onclick="logTerritory(4)">Zone 4</div>
+  <div class="zone" onclick="logTerritory(5)">Zone 5</div>
+  <div class="zone" onclick="logTerritory(6)">Zone 6</div>
+</div>
+
+<script>
+  let possession = null;
+  let timer = null;
+  let seconds = 0;
+
+  function setPossession(team) {
+    possession = team;
+    document.getElementById("currentPossession").innerText = team;
+  }
+
+  function formatTime(secs) {
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function updateTimer() {
+    seconds++;
+    document.getElementById("timer").innerText = formatTime(seconds);
+  }
+
+  function startGame() {
+    if (!timer) {
+      seconds = 0;
+      timer = setInterval(updateTimer, 1000);
+    }
+  }
+
+  function stopGame() {
+    clearInterval(timer);
+    timer = null;
+  }
+
+  function logTerritory(zone) {
+    if (!possession) {
+      alert("Select possession first (WHITE or DARK)");
+      return;
+    }
+
+    const data = {
+      time: formatTime(seconds),
+      possession: possession,
+      zone: `Zone ${zone}`,
+      quarter: document.getElementById("quarter").value,
+      game: document.getElementById("gameName").value,
+      whiteTeam: document.getElementById("whiteTeam").value,
+      darkTeam: document.getElementById("darkTeam").value
+    };
+
+    console.log("📊 LOGGED ENTRY:", data);
+
+    // Optional: send to webhook/Sheets here
+    // fetch('https://your-make-webhook-url', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(data)
+    // });
+  }
+</script>
+
+</body>
+</html>
